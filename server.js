@@ -3,6 +3,8 @@ const express = require('express');
 const fs = require('fs');
 // provides utilities for working w file and directory paths
 const path = require('path');
+const { animals } = require('./data/animals.json');
+
 // setting environment variable 'process.env.PORT' use this port or default to 3001
 const PORT = process.env.PORT || 3001;
 // instantiate the server
@@ -14,7 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 // parse incoming JSON data - (takes incoming POST data in form of JSON and prases it into the req.body)
 app.use(express.json());
 // both middleware functions need to be set up every time you create a server that's looking for POST data
-const { animals } = require('./data/animals.json');
+app.use(express.static('public'));
+
 
 
 // function to handle different types of queries, handling filter functionality and creating its own function
@@ -112,7 +115,7 @@ app.get('/api/animals/:id', (req, res) => {
 });
 
 // defining a route that listens to POST requests, not GET requests.
-// POST requests differe from GET requests in that they rep action of client requesting server to accept data rather than vice versa
+// POST requests different from GET requests in that they rep action of client requesting server to accept data rather than vice versa
 app.post('/api/animals', (req, res) => {
     // set id based on what next index of the array will be
     req.body.id = animals.length.toString();
@@ -128,6 +131,25 @@ app.post('/api/animals', (req, res) => {
     }
 });
 
+// index.html route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+// animals.html route
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+// zookeeper.html route
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+// wildcard route (catch route just in case)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
 
 app.listen(PORT, () => {
     console.log(`API server now on port ${PORT}!`);
